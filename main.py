@@ -3,6 +3,7 @@ import logging
 import sqlite3
 from abc import ABC, abstractmethod
 import xml.etree.ElementTree as ET
+import json
 
 # Logging configuration
 logging.basicConfig(filename='error.log', level=logging.ERROR)
@@ -37,23 +38,31 @@ class SQLiteDestination(DataDestination):
             conn = sqlite3.connect(db_file)
             c = conn.cursor()
 
-            # Creating a table (if not exists) for the data
-            c.execute('''CREATE TABLE IF NOT EXISTS xml_data (
-                            id INTEGER PRIMARY KEY,
-                            field1 TEXT,
-                            field2 TEXT,
-                            field3 TEXT
-                         )''')
+            for table_name, entries in data.items():
+                # Creating a table (if not exists) for the data
+                c.execute(f'''CREATE TABLE IF NOT EXISTS {table_name} (
+                                            id INTEGER PRIMARY KEY,
+                                            data TEXT
+                                         )''')
 
-            # Inserting data into the table
-            for entry in data:
-                c.execute('''INSERT INTO xml_data (field1, field2, field3)
-                             VALUES (?, ?, ?)''', (entry['field1'], entry['field2'], entry['field3']))
+                # Inserting data into the table
+                for entry in entries:
+                    data_json = json.dumps(self.xml_to_dict(entry))
+                    c.execute(f'''INSERT INTO {table_name} (data) VALUES (?)''', (data_json,))
 
             conn.commit()
             conn.close()
         except sqlite3.Error as e:
             logging.error(f"SQLite error: {e}")
+
+    def xml_to_dict(self, element):
+        data = {}
+        for child in element:
+            if child:
+                data[child.tag] = self.xml_to_dict(child)
+            else:
+                data[child.tag] = child.text
+        return data
 
 
 class DataProcessor:
@@ -64,15 +73,14 @@ class DataProcessor:
     def process_data(self, source_file, destination_file):
         data = self.data_source.read_data(source_file)
         if data:
-            data_to_push = []
+            tables_data = {}
             for entry in data.findall('entry'):
-                field1 = entry.find('field1').text
-                field2 = entry.find('field2').text
-                field3 = entry.find('field3').text
+                table_name = entry.tag
+                if table_name not in tables_data:
+                    tables_data[table_name] = []
+                tables_data[table_name].append(entry)
 
-                data_to_push.append({'field1': field1, 'field2': field2, 'field3': field3})
-
-            self.data_destination.write_data(data_to_push, destination_file)
+            self.data_destination.write_data(tables_data, destination_file)
 
 
 class DataProcessorFactory:
@@ -93,9 +101,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # Instantiating data source and destination
-    xml_data_source = XMLDataSource()
-    sqlite_data_destination = SQLiteDestination()
+    try:
+        processor_factory = DataProcessorFactory()
+        processor = processor_factory.create_data_processor(XMLDataSource, SQLiteDestination)
 
-    processor = DataProcessor(xml_data_source, sqlite_data_destination)
-    processor.process_data(args.xml_file, args.db_file)
+        processor.process_data(args.xml_file, args.db_file)
+    except ValueError as e:
+        print(f"Error: {e}")
