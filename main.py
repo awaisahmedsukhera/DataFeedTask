@@ -75,6 +75,17 @@ class DataProcessor:
             self.data_destination.write_data(data_to_push, destination_file)
 
 
+class DataProcessorFactory:
+    @staticmethod
+    def create_data_processor(source_type, destination_type):
+        try:
+            data_source = source_type()
+            data_destination = destination_type()
+            return DataProcessor(data_source, data_destination)
+        except Exception as e:
+            raise ValueError(f"Error creating DataProcessor: {e}")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process XML data and push it to a database')
     parser.add_argument('xml_file', type=str, help='Path to the XML file')
