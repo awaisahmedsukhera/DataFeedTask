@@ -1,3 +1,4 @@
+import argparse
 import logging
 import sqlite3
 from abc import ABC, abstractmethod
@@ -53,3 +54,37 @@ class SQLiteDestination(DataDestination):
             conn.close()
         except sqlite3.Error as e:
             logging.error(f"SQLite error: {e}")
+
+
+class DataProcessor:
+    def __init__(self, data_source: DataSource, data_destination: DataDestination):
+        self.data_source = data_source
+        self.data_destination = data_destination
+
+    def process_data(self, source_file, destination_file):
+        data = self.data_source.read_data(source_file)
+        if data:
+            data_to_push = []
+            for entry in data.findall('entry'):
+                field1 = entry.find('field1').text
+                field2 = entry.find('field2').text
+                field3 = entry.find('field3').text
+
+                data_to_push.append({'field1': field1, 'field2': field2, 'field3': field3})
+
+            self.data_destination.write_data(data_to_push, destination_file)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Process XML data and push it to a database')
+    parser.add_argument('xml_file', type=str, help='Path to the XML file')
+    parser.add_argument('db_file', type=str, help='Path to the SQLite database file')
+
+    args = parser.parse_args()
+
+    # Instantiating data source and destination
+    xml_data_source = XMLDataSource()
+    sqlite_data_destination = SQLiteDestination()
+
+    processor = DataProcessor(xml_data_source, sqlite_data_destination)
+    processor.process_data(args.xml_file, args.db_file)
