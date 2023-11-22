@@ -28,7 +28,7 @@ class XMLDataSource(DataSource):
 
 class DataDestination(ABC):
     @abstractmethod
-    def write_data(self, data, file_path):
+    def write_data(self, data, db_file):
         pass
 
 
@@ -42,27 +42,22 @@ class SQLiteDestination(DataDestination):
                 # Creating a table (if not exists) for the data
                 c.execute(f'''CREATE TABLE IF NOT EXISTS {table_name} (
                                             id INTEGER PRIMARY KEY,
-                                            data TEXT
+                                            {', '.join(self.get_column_names(entries[0]))}
                                          )''')
 
                 # Inserting data into the table
                 for entry in entries:
-                    data_json = json.dumps(self.xml_to_dict(entry))
-                    c.execute(f'''INSERT INTO {table_name} (data) VALUES (?)''', (data_json,))
+                    values = [entry.find(column).text for column in self.get_column_names(entry)]
+                    c.execute(f'''INSERT INTO {table_name} ({', '.join(self.get_column_names(entry))}) VALUES 
+                    ({', '.join(['?'] * len(values))})''', values)
 
             conn.commit()
             conn.close()
         except sqlite3.Error as e:
             logging.error(f"SQLite error: {e}")
 
-    def xml_to_dict(self, element):
-        data = {}
-        for child in element:
-            if child:
-                data[child.tag] = self.xml_to_dict(child)
-            else:
-                data[child.tag] = child.text
-        return data
+    def get_column_names(self, element):
+        return [child.tag for child in element]
 
 
 class DataProcessor:
@@ -73,14 +68,7 @@ class DataProcessor:
     def process_data(self, source_file, destination_file):
         data = self.data_source.read_data(source_file)
         if data:
-            tables_data = {}
-            for entry in data.findall('entry'):
-                table_name = entry.tag
-                if table_name not in tables_data:
-                    tables_data[table_name] = []
-                tables_data[table_name].append(entry)
-
-            self.data_destination.write_data(tables_data, destination_file)
+            self.data_destination.write_data(data, destination_file)
 
 
 class DataProcessorFactory:
