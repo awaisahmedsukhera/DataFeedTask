@@ -1,98 +1,34 @@
 import argparse
 import logging
-import sqlite3
-from abc import ABC, abstractmethod
-import xml.etree.ElementTree as ET
-import json
+from data_processor_factory import DataProcessorFactory
 
-# Logging configuration
-logging.basicConfig(filename='error.log', level=logging.ERROR)
+# Setting up a logger for the main script
+logger = logging.getLogger(__name__)
 
+# Creating a FileHandler to log errors to a file
+error_handler = logging.FileHandler('error.log')
+error_handler.setLevel(logging.ERROR)
+error_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+error_handler.setFormatter(error_formatter)
 
-class DataSource(ABC):
-    @abstractmethod
-    def read_data(self, file_path):
-        pass
-
-
-class XMLDataSource(DataSource):
-    def read_data(self, file_path):
-        try:
-            tree = ET.parse(file_path)
-            root = tree.getroot()
-            return root
-        except ET.ParseError as e:
-            logging.error(f"Error parsing XML: {e}")
-            return None
-
-
-class DataDestination(ABC):
-    @abstractmethod
-    def write_data(self, data, db_file):
-        pass
-
-
-class SQLiteDestination(DataDestination):
-    def write_data(self, data, db_file):
-        try:
-            conn = sqlite3.connect(db_file)
-            c = conn.cursor()
-
-            for table_name, entries in data.items():
-                # Creating a table (if not exists) for the data
-                c.execute(f'''CREATE TABLE IF NOT EXISTS {table_name} (
-                                            id INTEGER PRIMARY KEY,
-                                            {', '.join(self.get_column_names(entries[0]))}
-                                         )''')
-
-                # Inserting data into the table
-                for entry in entries:
-                    values = [entry.find(column).text for column in self.get_column_names(entry)]
-                    c.execute(f'''INSERT INTO {table_name} ({', '.join(self.get_column_names(entry))}) VALUES 
-                    ({', '.join(['?'] * len(values))})''', values)
-
-            conn.commit()
-            conn.close()
-        except sqlite3.Error as e:
-            logging.error(f"SQLite error: {e}")
-
-    def get_column_names(self, element):
-        return [child.tag for child in element]
-
-
-class DataProcessor:
-    def __init__(self, data_source: DataSource, data_destination: DataDestination):
-        self.data_source = data_source
-        self.data_destination = data_destination
-
-    def process_data(self, source_file, destination_file):
-        data = self.data_source.read_data(source_file)
-        if data:
-            self.data_destination.write_data(data, destination_file)
-
-
-class DataProcessorFactory:
-    @staticmethod
-    def create_data_processor(source_type, destination_type):
-        try:
-            data_source = source_type()
-            data_destination = destination_type()
-            return DataProcessor(data_source, data_destination)
-        except Exception as e:
-            raise ValueError(f"Error creating DataProcessor: {e}")
+# Adding the FileHandler to the logger
+logger.addHandler(error_handler)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Process XML data and push it to a database')
-    parser.add_argument('xml_file', type=str, help='Path to the XML file')
-    parser.add_argument('db_file', type=str, help='Path to the SQLite database file')
+    parser = argparse.ArgumentParser(description='Process data and push it to a destination')
+    parser.add_argument('--source-type', type=str, help='Type of the data source')
+    parser.add_argument('--destination-type', type=str, help='Type of the data destination')
+    parser.add_argument('source_file', type=str, help='Path to the source file')
+    parser.add_argument('destination_file', type=str, help='Path to the destination file')
 
     args = parser.parse_args()
 
     try:
+        # Using the factory to process data
+        logger.info(f"Starting data processing: Source={args.source_type}, Destination={args.destination_type}")
         processor_factory = DataProcessorFactory()
-        processor = processor_factory.create_data_processor(XMLDataSource, SQLiteDestination)
-
-        processor.process_data(args.xml_file, args.db_file)
+        processor_factory.process_data(args.source_type, args.destination_type, args.source_file, args.destination_file)
+        logger.info("Data processing completed successfully")
     except ValueError as e:
-        print(f"Error: {e}")
+        logger.error(f"Error processing data: {e}", exc_info=True)
