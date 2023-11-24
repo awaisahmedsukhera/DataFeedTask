@@ -1,13 +1,16 @@
 from unittest import TestCase
-
-from ...main.python.reader_factory import ReaderFactory
+from src.main.python.reader_factory import ReaderFactory
 
 
 class TestReaderFactory(TestCase):
+    def test_create_data_source_with_valid_type(self):
+        factory = ReaderFactory()
+        source_type = "xml"
+        data_destination = factory.create_data_source(source_type)
+        self.assertIsNotNone(data_destination)
 
-    def test_create_destination_with_invalid_type(self):
-        reader_factory = ReaderFactory()
-        source_type = "xmsl"
+    def test_create_data_destination_with_invalid_type(self):
+        factory = ReaderFactory()
+        source_type = "invalid_type"
         with self.assertRaises(ValueError):
-            reader_factory.create_data_source(source_type)
-
+            factory.create_data_source(source_type)

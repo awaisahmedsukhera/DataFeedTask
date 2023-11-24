@@ -1,4 +1,4 @@
-from reader import XMLDataSource
+from src.main.python.reader import XMLDataSource
 import logging
 from typing import Type
 
