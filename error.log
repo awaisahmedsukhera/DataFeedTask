@@ -1,0 +1,21 @@
+2023-11-24 01:07:46,558 - __main__ - ERROR - Error processing data: Invalid source type: xmsl
+Traceback (most recent call last):
+  File "/home/awais/PycharmProjects/DataFeedTask/src/main/python/main.py", line 33, in <module>
+    source_type = reader_factory.create_data_source(args.source_type)
+  File "/home/awais/PycharmProjects/DataFeedTask/src/main/python/reader_factory.py", line 18, in create_data_source
+    raise ValueError(error_message)
+ValueError: Invalid source type: xmsl
+2023-11-24 01:08:06,876 - __main__ - ERROR - Error processing data: Invalid source type: xmsl
+Traceback (most recent call last):
+  File "/home/awais/PycharmProjects/DataFeedTask/src/main/python/main.py", line 33, in <module>
+    source_type = reader_factory.create_data_source(args.source_type)
+  File "/home/awais/PycharmProjects/DataFeedTask/src/main/python/reader_factory.py", line 18, in create_data_source
+    raise ValueError(error_message)
+ValueError: Invalid source type: xmsl
+2023-11-24 01:08:26,235 - __main__ - ERROR - Error processing data: Invalid destination type: sqslite
+Traceback (most recent call last):
+  File "/home/awais/PycharmProjects/DataFeedTask/src/main/python/main.py", line 35, in <module>
+    destination_type = writer_factory.create_data_destination(args.destination_type)
+  File "/home/awais/PycharmProjects/DataFeedTask/src/main/python/writer_factory.py", line 18, in create_data_destination
+    raise ValueError(error_message)
+ValueError: Invalid destination type: sqslite

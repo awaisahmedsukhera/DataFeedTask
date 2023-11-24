@@ -1,6 +1,8 @@
 import argparse
 import logging
-from data_processor_factory import DataProcessorFactory
+from reader_factory import ReaderFactory
+from writer_factory import WriterFactory
+from data_processor import DataProcessor
 
 # Setting up a logger for the main script
 logger = logging.getLogger(__name__)
@@ -25,10 +27,15 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     try:
-        # Using the factory to process data
         logger.info(f"Starting data processing: Source={args.source_type}, Destination={args.destination_type}")
-        processor_factory = DataProcessorFactory()
-        processor_factory.process_data(args.source_type, args.destination_type, args.source_file, args.destination_file)
+        # Using the factories to get source and destination type
+        reader_factory = ReaderFactory()
+        source_type = reader_factory.create_data_source(args.source_type)
+        writer_factory = WriterFactory()
+        destination_type = writer_factory.create_data_destination(args.destination_type)
+        # Processing data based on the source and destination types
+        data_processor = DataProcessor()
+        data_processor.process_data(source_type, destination_type, args.source_file, args.destination_file)
         logger.info("Data processing completed successfully")
     except ValueError as e:
         logger.error(f"Error processing data: {e}", exc_info=True)

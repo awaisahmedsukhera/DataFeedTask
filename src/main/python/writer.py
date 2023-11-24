@@ -14,28 +14,30 @@ class DataDestination(ABC):
 
 class SQLiteDestination(DataDestination):
     def write_data(self, data, db_file):
+
         try:
             conn = sqlite3.connect(db_file)
             c = conn.cursor()
 
-            for table_name, entries in data.items():
+            table_name = data.tag
+
+            for item in data.findall("item"):
+                column_names = [child.tag for child in item]
+
                 # Creating a table (if not exists) for the data
                 c.execute(f'''CREATE TABLE IF NOT EXISTS {table_name} (
-                                            id INTEGER PRIMARY KEY,
-                                            {', '.join(self.get_column_names(entries[0]))}
-                                         )''')
+                                                    id INTEGER PRIMARY KEY,
+                                                    {', '.join(column_names)}
+                                                 )''')
 
                 # Inserting data into the table
-                for entry in entries:
-                    values = [entry.find(column).text for column in self.get_column_names(entry)]
-                    c.execute(f'''INSERT INTO {table_name} ({', '.join(self.get_column_names(entry))}) VALUES 
-                    ({', '.join(['?'] * len(values))})''', values)
+                values = [child.text for child in item]
+                placeholders = ', '.join(['?'] * len(values))
+
+                c.execute(f"INSERT INTO {table_name} ({', '.join(column_names)}) VALUES ({placeholders})", values)
 
             conn.commit()
             conn.close()
         except sqlite3.Error as e:
             error_message = f"SQLite error while writing data to {db_file}: {e}"
             logger.error(error_message, exc_info=True)
-
-    def get_column_names(self, element):
-        return [child.tag for child in element]

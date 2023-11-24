@@ -1,0 +1,11 @@
+Name                Stmts   Miss  Cover
+---------------------------------------
+__init__.py             0      0   100%
+data_processor.py      12     12     0%
+main.py                29     29     0%
+reader.py              18     18     0%
+reader_factory.py      12     12     0%
+writer.py              25     25     0%
+writer_factory.py      12     12     0%
+---------------------------------------
+TOTAL                 108    108     0%

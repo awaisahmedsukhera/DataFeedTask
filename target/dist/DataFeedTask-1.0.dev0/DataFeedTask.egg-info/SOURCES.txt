@@ -1,0 +1,14 @@
+__init__.py
+data_processor.py
+main.py
+reader.py
+reader_factory.py
+setup.py
+writer.py
+writer_factory.py
+DataFeedTask.egg-info/PKG-INFO
+DataFeedTask.egg-info/SOURCES.txt
+DataFeedTask.egg-info/dependency_links.txt
+DataFeedTask.egg-info/namespace_packages.txt
+DataFeedTask.egg-info/top_level.txt
+DataFeedTask.egg-info/zip-safe
