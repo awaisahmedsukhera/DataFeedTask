@@ -1,15 +1,14 @@
-from src.main.python.reader import XMLDataSource
+from src.main.python.reader import Reader, XMLDataSource
 import logging
 from typing import Type
 
-# Creating a logger for this file
 logger = logging.getLogger(__name__)
 
 
 # Factory class to create object based on source type
 class ReaderFactory:
     @staticmethod
-    def create_data_source(source_type: str) -> Type[XMLDataSource]:
+    def create_data_source(source_type: str) -> Type[Reader]:
         if source_type == "xml":
             return XMLDataSource()
         else:

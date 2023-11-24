@@ -2,17 +2,16 @@ from abc import ABC, abstractmethod
 import logging
 import sqlite3
 
-# Creating a logger for this module
 logger = logging.getLogger(__name__)
 
 
-class DataDestination(ABC):
+class Writer(ABC):
     @abstractmethod
     def write_data(self, data, db_file):
         pass
 
 
-class SQLiteDestination(DataDestination):
+class SQLiteDestination(Writer):
     def write_data(self, data, db_file):
 
         try:

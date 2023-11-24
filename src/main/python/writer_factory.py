@@ -1,15 +1,14 @@
-from writer import SQLiteDestination
+from writer import SQLiteDestination, Writer
 import logging
 from typing import Type
 
-# Creating a logger for this file
 logger = logging.getLogger(__name__)
 
 
 # Factory class to create object based on destination type
 class WriterFactory:
     @staticmethod
-    def create_data_destination(destination_type: str) -> Type[SQLiteDestination]:
+    def create_data_destination(destination_type: str) -> Type[Writer]:
         if destination_type == "sqlite":
             return SQLiteDestination()
         else:

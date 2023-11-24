@@ -1,4 +1,6 @@
 import logging
+from reader import Reader
+from writer import Writer
 
 # Creating a logger for this file
 logger = logging.getLogger(__name__)
@@ -6,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class DataProcessor:
     @staticmethod
-    def process_data(data_source, data_destination, source_file, destination_file):
+    def process_data(data_source: Reader, data_destination: Writer, source_file: str, destination_file: str):
 
         if data_source and data_destination:
             data = data_source.read_data(source_file)
