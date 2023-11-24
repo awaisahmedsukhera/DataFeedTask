@@ -1,0 +1,10 @@
+{
+  "errors": [
+    {
+      "test": "unittest.loader._FailedTest.reader_factory_tests",
+      "traceback": "Traceback (most recent call last):\n  File \"/usr/lib/python3.10/unittest/case.py\", line 59, in testPartExecutor\n    yield\n  File \"/usr/lib/python3.10/unittest/case.py\", line 591, in run\n    self._callTestMethod(testMethod)\n  File \"/usr/lib/python3.10/unittest/case.py\", line 549, in _callTestMethod\n    method()\n  File \"/usr/lib/python3.10/unittest/loader.py\", line 34, in testFailure\n    raise self._exception\nImportError: Failed to import test module: reader_factory_tests\nTraceback (most recent call last):\n  File \"/usr/lib/python3.10/unittest/loader.py\", line 154, in loadTestsFromName\n    module = __import__(module_name)\n  File \"/home/awais/PycharmProjects/DataFeedTask/src/unittest/python/reader_factory_tests.py\", line 3, in <module>\n    from src.main.python.reader_factory import ReaderFactory\nModuleNotFoundError: No module named 'src'\n\n"
+    }
+  ],
+  "failures": [],
+  "tests-run": 1
+}

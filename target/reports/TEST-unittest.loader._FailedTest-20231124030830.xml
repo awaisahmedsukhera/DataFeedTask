@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="unittest.loader._FailedTest-20231124030830" tests="1" file="unittest/loader.py" time="0.001" timestamp="2023-11-24T03:08:30" failures="0" errors="1" skipped="0">
+	<testcase classname="unittest.loader._FailedTest" name="reader_factory_tests" time="0.001" timestamp="2023-11-24T03:08:30">
+		<error type="ImportError" message="Failed to import test module: reader_factory_tests
+Traceback (most recent call last):
+  File &quot;/usr/lib/python3.10/unittest/loader.py&quot;, line 154, in loadTestsFromName
+    module = __import__(module_name)
+  File &quot;/home/awais/PycharmProjects/DataFeedTask/src/unittest/python/reader_factory_tests.py&quot;, line 3, in &lt;module&gt;
+    from src.main.python.reader_factory import ReaderFactory
+ModuleNotFoundError: No module named 'src'
+"><![CDATA[Traceback (most recent call last):
+  File "/usr/lib/python3.10/unittest/case.py", line 59, in testPartExecutor
+    yield
+  File "/usr/lib/python3.10/unittest/case.py", line 591, in run
+    self._callTestMethod(testMethod)
+  File "/usr/lib/python3.10/unittest/case.py", line 549, in _callTestMethod
+    method()
+  File "/usr/lib/python3.10/unittest/loader.py", line 34, in testFailure
+    raise self._exception
+ImportError: Failed to import test module: reader_factory_tests
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/unittest/loader.py", line 154, in loadTestsFromName
+    module = __import__(module_name)
+  File "/home/awais/PycharmProjects/DataFeedTask/src/unittest/python/reader_factory_tests.py", line 3, in <module>
+    from src.main.python.reader_factory import ReaderFactory
+ModuleNotFoundError: No module named 'src'
+
+]]></error>
+	</testcase>
+</testsuite>
